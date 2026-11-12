@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Protokoll">
+<title>Belastungsprotokoll</title>
+<style>
+:root{
+  --bg:#f6f4fb;--ink:#1f2433;--mute:#5b6275;--card:#fff;--line:#d9dcea;
+  --a1:#0f766e;--t1:#d9f2ee;
+  --a2:#6d28d9;--t2:#ece4fb;
+  --a3:#be123c;--t3:#fde2e7;
+  --a4:#a16207;--t4:#fbefc8;
+  --a5:#1d4ed8;--t5:#dbe8fd;
+  --on:#fff;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#14151d;--ink:#eceef6;--mute:#a4abc0;--card:#1d1f2b;--line:#33374a;
+    --a1:#5eead4;--t1:#12312e;--a2:#c4b5fd;--t2:#2a2146;--a3:#fda4af;--t3:#40202a;
+    --a4:#fcd34d;--t4:#3a3015;--a5:#93c5fd;--t5:#172a4a;--on:#14151d;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14151d;--ink:#eceef6;--mute:#a4abc0;--card:#1d1f2b;--line:#33374a;
+  --a1:#5eead4;--t1:#12312e;--a2:#c4b5fd;--t2:#2a2146;--a3:#fda4af;--t3:#40202a;
+  --a4:#fcd34d;--t4:#3a3015;--a5:#93c5fd;--t5:#172a4a;--on:#14151d;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 "Avenir Next","Nunito",ui-rounded,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+main{max-width:560px;margin:0 auto;padding:18px 16px 40px}
+h1{font-size:1.7rem;margin:6px 0 2px;letter-spacing:-.01em}
+.sub{color:var(--mute);margin:0 0 16px;font-size:.95rem}
+section{border-radius:20px;padding:16px;margin:0 0 14px;background:var(--t);border:2px solid transparent}
+section h2{font-size:1.08rem;margin:0 0 4px;color:var(--a)}
+section p.h{margin:0 0 10px;color:var(--mute);font-size:.9rem}
+.s1{--a:var(--a1);--t:var(--t1)}.s2{--a:var(--a2);--t:var(--t2)}.s3{--a:var(--a3);--t:var(--t3)}.s4{--a:var(--a4);--t:var(--t4)}.s5{--a:var(--a5);--t:var(--t5)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.chips button{font:inherit;font-size:.97rem;padding:9px 14px;border-radius:999px;border:2px solid var(--a);background:var(--card);color:var(--ink);min-height:44px}
+.chips button[aria-pressed="true"]{background:var(--a);color:var(--on);font-weight:700}
+label{display:block;font-size:.92rem;font-weight:600;margin:6px 0 4px}
+input,textarea{font:inherit;width:100%;padding:11px 12px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+textarea{min-height:76px;resize:vertical}
+.row{display:flex;gap:10px}.row>div{flex:1}
+:focus-visible{outline:3px solid var(--a,var(--a5));outline-offset:2px}
+.btn{font:inherit;font-weight:700;border:0;border-radius:14px;padding:14px 18px;min-height:48px;width:100%;background:var(--a5);color:var(--on)}
+.btn.alt{background:var(--card);color:var(--ink);border:2px solid var(--line);margin-top:8px}
+.entry{background:var(--card);border-radius:16px;padding:12px 14px;margin:0 0 10px;border:2px solid var(--line)}
+.entry b{display:block}.entry small{color:var(--mute);display:block;white-space:pre-wrap;margin-top:4px}
+.entry button{font:inherit;font-size:.85rem;margin-top:8px;padding:8px 12px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--mute);min-height:40px}
+.empty{color:var(--mute);margin:0 0 14px}
+h3{margin:22px 0 10px;font-size:1.1rem}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%}
+#toast.on{opacity:1}
+.hint{font-size:.85rem;color:var(--mute);margin:16px 0 0}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>Belastungsprotokoll</h1>
+<p class="sub">Stichworte reichen. Ein unvollständiger Eintrag ist besser als keiner.</p>
+
+<section class="s5">
+  <h2>Wann war das?</h2>
+  <div class="row">
+    <div><label for="date">Datum</label><input type="date" id="date"></div>
+    <div><label for="time">Uhrzeit</label><input type="time" id="time"></div>
+  </div>
+</section>
+
+<section class="s1">
+  <h2>Was ich getan habe</h2>
+  <p class="h">Mehrere möglich. Auch Geistiges und Emotionales zählt.</p>
+  <div class="chips" id="c-did"></div>
+  <label for="didText">Genauer (optional)</label>
+  <input id="didText" type="text" placeholder="z. B. Baumarkt, zweimal">
+</section>
+
+<section class="s2">
+  <h2>Frühwarnzeichen</h2>
+  <div class="chips" id="c-warn"></div>
+</section>
+
+<section class="s3">
+  <h2>Körper</h2>
+  <label>Schwere in den Beinen</label>
+  <div class="chips" id="c-legs"></div>
+  <label>Gefühl, nicht mehr stehen zu können / Schwindel</label>
+  <div class="chips" id="c-stand"></div>
+  <label for="standText">Wann und wie lange? (optional)</label>
+  <input id="standText" type="text" placeholder="z. B. nachmittags, ca. 20 Minuten">
+</section>
+
+<section class="s4">
+  <h2>Schlaf und Magen-Darm</h2>
+  <label>Schlaf der letzten Nacht</label>
+  <div class="chips" id="c-sleep"></div>
+  <label>Magen-Darm</label>
+  <div class="chips" id="c-gut"></div>
+</section>
+
+<section class="s5">
+  <h2>Erholung und Notiz</h2>
+  <label for="recover">Wie lange hat die Erholung gedauert?</label>
+  <input id="recover" type="text" placeholder="z. B. 2 Tage, noch nicht vorbei">
+  <label for="note">Notiz (optional)</label>
+  <textarea id="note"></textarea>
+</section>
+
+<button class="btn" id="save">Eintrag speichern</button>
+
+<h3>Bisherige Einträge</h3>
+<div id="list"></div>
+
+<h3>Für den Arzttermin</h3>
+<button class="btn alt" id="export">Letzte 14 Tage als Text kopieren</button>
+<textarea id="out" hidden aria-label="Exportierter Text"></textarea>
+
+<p class="hint">Die Einträge liegen nur in diesem Browser auf deinem Gerät. Öffne die Seite am besten gleich vom Home-Bildschirm aus und trage dort ein, denn Safari und das Home-Bildschirm-Symbol haben getrennte Speicher. Kopier dir den Text ab und zu irgendwohin als Sicherung.</p>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const KEY='belastungsprotokoll-v1';
+let data=[];
+try{data=JSON.parse(localStorage.getItem(KEY)||'[]');if(!Array.isArray(data))data=[]}catch(e){data=[]}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){toast('Speichern hat nicht geklappt. Bitte Text kopieren.');return false}}
+const cfg={
+  did:{m:1,o:['Körperlich anstrengend','Geistig anstrengend','Emotional belastend','Wege oder Termine','Haushalt','Kontakt oder Besuch']},
+  warn:{m:1,o:['Augen kaum offen','Bleierne Schwere','Beine tragen nicht','Unruhe','Kein Warnzeichen']},
+  legs:{o:['Keine','Leicht','Deutlich','Sehr stark']},
+  stand:{o:['Nein','Kurz','Länger']},
+  sleep:{o:['1 sehr schlecht','2','3','4','5 erholsam']},
+  gut:{o:['Besser','Gleich','Schlechter']}
+};
+const sel={};
+function drawChips(k){
+  const box=document.getElementById('c-'+k);box.innerHTML='';
+  sel[k]=cfg[k].m?[]:'';
+  cfg[k].o.forEach(v=>{
+    const b=document.createElement('button');b.type='button';b.textContent=v;b.setAttribute('aria-pressed','false');
+    b.addEventListener('click',()=>{
+      if(cfg[k].m){const i=sel[k].indexOf(v);i>=0?sel[k].splice(i,1):sel[k].push(v);b.setAttribute('aria-pressed',i<0)}
+      else{const on=sel[k]!==v;sel[k]=on?v:'';box.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed',on)}
+    });
+    box.appendChild(b);
+  });
+}
+Object.keys(cfg).forEach(drawChips);
+function now(){
+  const d=new Date(),p=n=>String(n).padStart(2,'0');
+  document.getElementById('date').value=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+  document.getElementById('time').value=p(d.getHours())+':'+p(d.getMinutes());
+}
+now();
+function fmtDate(s){const [y,m,d]=s.split('-');return d+'.'+m+'.'+y}
+function line(e){
+  const parts=[];
+  const did=[...(e.did||[])];if(e.didText)did.push(e.didText);
+  if(did.length)parts.push('Getan: '+did.join(', '));
+  if(e.warn&&e.warn.length)parts.push('Warnzeichen: '+e.warn.join(', '));
+  if(e.legs)parts.push('Beine: '+e.legs);
+  if(e.stand)parts.push('Stehgefühl/Schwindel: '+e.stand+(e.standText?' ('+e.standText+')':''));
+  if(e.sleep)parts.push('Schlaf: '+e.sleep);
+  if(e.gut)parts.push('Magen-Darm: '+e.gut);
+  if(e.recover)parts.push('Erholung: '+e.recover);
+  if(e.note)parts.push('Notiz: '+e.note);
+  return parts.join('\n');
+}
+function head(e){return fmtDate(e.date)+(e.time?', '+e.time+' Uhr':'')}
+function render(){
+  const box=document.getElementById('list');box.innerHTML='';
+  if(!data.length){box.innerHTML='<p class="empty">Noch nichts eingetragen.</p>';return}
+  [...data].sort((a,b)=>(b.date+(b.time||'')).localeCompare(a.date+(a.time||''))).forEach(e=>{
+    const d=document.createElement('div');d.className='entry';
+    const b=document.createElement('b');b.textContent=head(e);
+    const s=document.createElement('small');s.textContent=line(e)||'Ohne Angaben';
+    const x=document.createElement('button');x.type='button';x.textContent='Löschen';
+    x.addEventListener('click',()=>{if(confirm('Diesen Eintrag löschen?')){data=data.filter(i=>i.id!==e.id);persist();render()}});
+    d.append(b,s,x);box.appendChild(d);
+  });
+}
+render();
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),2600)}
+document.getElementById('save').addEventListener('click',()=>{
+  const e={id:Date.now(),date:document.getElementById('date').value,time:document.getElementById('time').value,
+    did:[...sel.did],didText:document.getElementById('didText').value.trim(),warn:[...sel.warn],legs:sel.legs,stand:sel.stand,
+    standText:document.getElementById('standText').value.trim(),sleep:sel.sleep,gut:sel.gut,
+    recover:document.getElementById('recover').value.trim(),note:document.getElementById('note').value.trim()};
+  if(!e.date){toast('Bitte ein Datum wählen.');return}
+  data.push(e);
+  if(persist()){
+    Object.keys(cfg).forEach(drawChips);
+    ['didText','standText','recover','note'].forEach(i=>document.getElementById(i).value='');
+    now();render();toast('Eintrag gespeichert');window.scrollTo({top:0,behavior:'smooth'});
+  }
+});
+document.getElementById('export').addEventListener('click',async()=>{
+  const lim=new Date();lim.setDate(lim.getDate()-14);
+  const l=[...data].filter(e=>new Date(e.date)>=lim).sort((a,b)=>(a.date+(a.time||'')).localeCompare(b.date+(b.time||'')));
+  const out=document.getElementById('out');
+  if(!l.length){toast('Keine Einträge in den letzten 14 Tagen.');return}
+  out.value='Belastungsprotokoll, letzte 14 Tage\n\n'+l.map(e=>head(e)+'\n'+line(e)).join('\n\n');
+  try{await navigator.clipboard.writeText(out.value);toast('Text kopiert')}
+  catch(err){out.hidden=false;out.rows=10;out.select();toast('Bitte den Text von Hand kopieren.')}
+});
+</script>
+</body>
+</html>
